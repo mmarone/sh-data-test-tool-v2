@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sale Here STAR Data Tool</title>
+
+  <!-- เพิ่มบรรทัดนี้ก่อน /style.css -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Noto+Sans+Thai:wght@400;500;700;800&display=swap"
+    rel="stylesheet">
+
+
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <!-- Floating Orbs Background -->
+  <div class="orb-container" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand"><span class="logo">★</span><span>Sale Here STAR</span><small>Test Data Tool</small></div>
+    <div class="top-actions">
+      <span id="apiStatus" class="status offline">API: Not connected</span>
+      <button id="clearTokenBtn" class="ghost">ล้าง Token</button>
+    </div>
+  </header>
+
+  <!-- Progress Bar — วางต่อจาก </header> บรรทัด 16 -->
+  <div id="progress-bar-wrap">
+    <div id="progress-bar"></div>
+    <div id="progress-label"></div>
+  </div>
+
+  <!-- แถบเมนูแท็บด้านบน -->
+  <nav class="nav-tabs-container">
+    <div class="nav-tabs">
+      <button class="tab-btn active" data-tab="star">
+        <span class="tab-icon">★</span> Sale Here STAR
+      </button>
+      <button class="tab-btn" data-tab="reward">
+        <span class="tab-icon">🎁</span> Reward
+      </button>
+      <button class="tab-btn" data-tab="verify">
+        <span class="tab-icon">🛡️</span> Verify User
+      </button>
+            <button class="tab-btn" data-tab="idcard">
+        <span class="tab-icon">🪪</span> Gen ID Card
+      </button>
+    </div>
+  </nav>
+
+
+  <main class="container tab-panel active" id="tab-star">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">QA / Mock Data Generator</div>
+        <h1>สร้างกิจกรรม Sale Here STAR</h1>
+        <p>สร้างข้อมูลทดสอบหลายกิจกรรมจาก API จริง โดยไม่ต้องกรอกหน้า Back Office ทีละรายการ</p>
+      </div>
+    </section>
+
+    <section class="card security">
+
+      <div class="grid two endpoint-layout">
+        <div class="endpoint-stack">
+          <div class="card-title">
+            <div><span class="step">0</span><b>API Authorization</b></div>
+          </div>
+          <div class="endpoint-field">
+            <span>Environment</span>
+            <div class="endpoint-options">
+              <label class="check">
+                <input type="radio" name="apiEnvironment" value="sit" checked />
+                SIT
+              </label>
+              <label class="check">
+                <input type="radio" name="apiEnvironment" value="uat" />
+                UAT
+              </label>
+            </div>
+          </div>
+
+          <label>Token
+            <div class="input-action">
+              <input id="token" type="password" placeholder="วาง access token (eyJ...) ที่นี่" autocomplete="off" />
+              <button id="toggleTokenBtn" type="button" class="secondary">แสดง</button>
+            </div>
+            <div id="tokenInfo" class="token-info"></div>
+            <details style="margin-top:6px; font-size:12px;">
+              <summary style="cursor:pointer; color:var(--muted);">
+                🔍 ดูรายละเอียด Token (Decoded Claims)
+              </summary>
+              <pre id="tokenDecoded"
+                style="margin-top:6px; padding:8px; max-height:160px; font-size:11px;">ไม่มีข้อมูล</pre>
+            </details>
+          </label>
+        </div>
+
+        <div class="creation-panel">
+          <div class="card-title">
+            <div><span class="step">1</span><b>รูปแบบการสร้าง</b></div>
+          </div>
+
+          <div class="mode-toolbar">
+            <label class="mode">
+              <input type="radio" name="mode" value="quick">
+              <strong>สร้างด่วน</strong>
+              <span>สุ่มข้อมูล 1 กิจกรรม และ Publish</span>
+            </label>
+
+            <button id="modeOptionsBtn" type="button" class="secondary mode-options-trigger">
+              ตัวเลือกการสร้าง: <span id="modeOptionsLabel">Bulk</span>
+            </button>
+          </div>
+
+          <button id="createAndPublishTopBtn" type="button" class="primary dark create-top-btn">
+            สร้างกิจกรรม
+          </button>
+
+          <div class="inline-controls">
+            <p class="creation-help-text">
+              ถ้ากดสร้างหลังจากเลือกกิจกรรม จะเป็นการสุ่มข้อมูลให้ หากต้องการเพิ่มรายละเอียดกิจกรรมเอง
+              ก่อนกดสร้างให้แก้ไขในข้อ 2-6
+            </p>
+            <label>จำนวนกิจกรรม
+              <input id="count" type="number" min="1" max="50" value="5" />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="warning">
+        💡 <b>วิธีนำ Admin Token ที่ถูกต้องมาใส่:</b>
+        <ol style="margin:6px 0 0 18px; padding:0;">
+          <li>เปิดแท็บใหม่ เข้าเว็บ <b>Sale Here Back Office (SIT / UAT Admin)</b> และ Login</li>
+          <li>กด <code>F12</code> ไปที่แท็บ <b>Network</b> พิมพ์กรองคำว่า <code>graphql</code></li>
+          <li>คลิกเปลี่ยนหน้าเมนูใน Admin 1 ครั้ง แล้วคลิกที่แถว <b>graphql</b> ที่ขึ้นมาใหม่</li>
+          <li>ดูแท็บ <b>Headers</b> &gt; หัวข้อ <b>Request Headers</b> &gt; คัดลอกค่าจาก <b>authorization</b>
+            (ขึ้นต้นด้วย <code>eyJ...</code>) มาวาง</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="card">
+      <details class="section-details">
+        <summary class="card-title section-summary">
+          <div><span class="step">2</span><b>ข้อมูลกิจกรรม</b></div>
+        </summary>
+
+        <div class="grid two">
+          <label>ชื่อกิจกรรม
+            <input id="title" placeholder="เช่น EP. ตามด้วยชื่อ" />
+          </label>
+          <label>SEO Slug
+            <input id="slug" placeholder="brandName-{{timestamp}}" />
+          </label>
+
+          <label>Brand
+            <div class="input-action">
+              <input id="brandSearch" placeholder="พิมพ์ชื่อ Brand แล้วกดค้นหา" />
+              <button id="searchBrandBtn" class="secondary">ค้นหา</button>
+            </div>
+            <select id="brandSelect">
+              <option value="">-- เลือก Brand --</option>
+            </select>
+          </label>
+
+          <label>Category
+            <select id="categorySelect">
+              <option value="">-- เลือก Category --</option>
+            </select>
+          </label>
+
+          <label>Cover Image URL
+            <input id="coverImage" placeholder="https://img.salehere.co.th/..." />
+          </label>
+          <div class="grid two">
+            <label>Social Gencode
+              <select id="genCodeSocialType">
+                <option value="">ไม่มี</option>
+                <option value="facebook">Facebook</option>
+                <option value="instagram">Instagram</option>
+                <option value="tiktok">TikTok</option>
+              </select>
+            </label>
+          </div>
+
+
+        </div>
+    </section>
+
+    <section class="card">
+      <details class="timeline-details">
+        <summary class="card-title timeline-summary">
+          <div><span class="step">3</span><b>ช่วงเวลา</b></div>
+        </summary>
+
+        <div class="time-layout">
+          <div class="campaign-status-control">
+            <span class="campaign-status-heading">สถานะกิจกรรมที่ต้องการ</span>
+
+            <input id="campaignStatus" type="hidden" value="registering" />
+
+            <button id="chooseCampaignStatusBtn" type="button" class="secondary">
+              <span id="campaignStatusLabel">เปิดลงทะเบียน</span>
+              <span aria-hidden="true">▾</span>
+            </button>
+          </div>
+          <div class="time-row">
+            <label>วันที่เริ่มต้น
+              <input id="beginDate" type="datetime-local" />
+            </label>
+            <label>วันที่สิ้นสุด
+              <input id="endDate" type="datetime-local" />
+            </label>
+          </div>
+
+          <div class="time-row">
+            <label>ลงทะเบียน เริ่มต้น
+              <input id="startRegisterDate" type="datetime-local" />
+            </label>
+            <label>ลงทะเบียน สิ้นสุด
+              <input id="endRegisterDate" type="datetime-local" />
+            </label>
+          </div>
+
+          <div class="time-row">
+            <label>วันที่จัดส่งสินค้า
+              <input id="startShippingDate" type="datetime-local" />
+            </label>
+          </div>
+
+          <div class="time-row">
+            <label>ส่งดราฟต์ เริ่มต้น
+              <input id="startDraftDate" type="datetime-local" />
+            </label>
+            <label>ส่งดราฟต์ สิ้นสุด
+              <input id="endDraftDate" type="datetime-local" />
+            </label>
+          </div>
+
+          <div class="time-row">
+            <label>ส่งลิงก์รีวิว เริ่มต้น
+              <input id="startReviewDate" type="datetime-local" />
+            </label>
+            <label>ส่งลิงก์รีวิว สิ้นสุด
+              <input id="endReviewDate" type="datetime-local" />
+            </label>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <details class="section-details">
+        <summary class="card-title section-summary">
+          <div><span class="step">4</span><b>เงื่อนไข</b></div>
+        </summary>
+        <div class="grid two">
+          <label>จำนวนสิทธิ์ผู้ลงทะเบียน
+            <input id="maxRegister" type="number" value="150" min="0" />
+          </label>
+          <label>จำนวนสิทธิ์ผู้รับกล่อง
+            <input id="maxQuota" type="number" value="120" min="0" />
+          </label>
+        </div>
+    </section>
+
+    <section class="card">
+      <details class="section-details">
+        <summary class="card-title section-summary">
+          <div><span class="step">5</span><b>เนื้อหา</b></div>
+        </summary>
+        <button id="addSectionBtn" class="secondary">+ เพิ่ม Text Section</button>
+        </div>
+        <div id="sections"></div>
+    </section>
+
+    <section class="card preview-card">
+      <details class="section-details">
+        <summary class="card-title section-summary">
+          <div><span class="step">6</span><b>Preview Payload</b></div>
+        </summary>
+
+        <div class="preview-actions">
+          <button id="buildPayloadBtn" class="secondary">สร้าง Preview</button>
+        </div>
+
+        <pre id="payloadPreview">กด "สร้าง Preview" เพื่อดู variables ที่จะส่ง</pre>
+      </details>
+    </section>
+
+    <section class="action-bar">
+      <button id="createAndPublishBtn" class="primary dark">
+        สร้างกิจกรรม
+      </button>
+    </section>
+
+    <section class="card">
+      <div class="card-title">
+        <div><b>กิจกรรมที่สร้างจากเครื่องมือนี้</b></div>
+        <div class="history-tools">
+          <label class="check">
+            <input id="selectAllHistory" type="checkbox" />
+            เลือกทั้งหมด
+          </label>
+          <button id="deleteSelectedHistoryBtn" class="primary dark">ลบที่เลือก</button>
+          <button id="clearHistoryBtn" class="secondary">ล้าง History</button>
+        </div>
+      </div>
+      <div id="history"></div>
+    </section>
+
+    <section class="card log-card">
+      <div class="card-title">
+        <div><b>API Log</b></div><button id="clearLogBtn" class="secondary">Clear</button>
+      </div>
+      <div id="log"></div>
+    </section>
+  </main>
+
+  <!-- เนื้อหาแท็บ 2: Reward -->
+  <section class="container tab-panel" id="tab-reward">
+    <div class="card coming-soon-card">
+      <div class="coming-soon-icon">🎁</div>
+      <h2>Reward</h2>
+      <p class="coming-soon-badge">เร็วๆ นี้</p>
+      <p class="coming-soon-desc">ระบบจัดการและตั้งค่า Reward กำลังอยู่ในระหว่างการพัฒนา</p>
+    </div>
+  </section>
+  <!-- เนื้อหาแท็บ 3: Verify User -->
+  <section class="container tab-panel" id="tab-verify">
+    <section class="card verify-card">
+      <div class="card-title">
+        <div><span class="step">V</span><b>Verify User</b></div>
+      </div>
+
+      <div class="verify-token-box">
+                <label>ประวัติเบอร์ที่เคยโหลด
+          <select id="verifyTokenHistory">
+            <option value="">— เลือกเบอร์ —</option>
+          </select>
+        </label>
+        <label>Token จากเว็บหน้าบ้าน
+          <textarea id="verifyFrontToken" rows="1" placeholder="วาง token จากเว็บหน้าบ้านที่นี่"></textarea>
+        </label>
+
+        <!-- 👇 ปรับปรุงส่วนปุ่ม: เคลียร์ Token อยู่ซ้าย, โหลดข้อมูลผู้ใช้ อยู่ขวา -->
+        <div class="verify-token-actions">
+          <button id="clearVerifyTokenBtn" type="button" class="secondary verify-token-btn">
+            เคลียร์ Token
+          </button>
+          <button id="loadVerifyProfileBtn" type="button" class="primary dark verify-token-btn">
+            โหลดข้อมูลผู้ใช้
+          </button>
+        </div>
+      </div>
+
+
+      <div id="verifyProfileSummary" class="verify-profile-summary" hidden></div>
+
+      <div class="verify-overview">
+        <div class="verify-group">
+          <div class="verify-group-title">
+            <div>
+              <b>ข้อมูลหลักบนการ์ด STAR</b>
+              <span id="verifyMainCount">ยังไม่ได้โหลดข้อมูล</span>
+            </div>
+
+            <!-- 👈 ย้ายปุ่มมาไว้ตรงนี้ (ก่อนปิด div ของ verify-group-title) -->
+            <button id="verifySelectAllBtn" type="button" class="secondary verify-select-all-btn">
+              ☑️ เลือกทั้งหมด
+            </button>
+          </div>
+
+          <div id="verifyMainList" class="verify-list"></div>
+        </div>
+
+
+        <div class="verify-group">
+          <div class="verify-group-title">
+            <div>
+              <b>ข้อมูลเตรียมไว้ ตอนใช้งาน</b>
+              <span id="verifyReadyCount">ยังไม่ได้โหลดข้อมูล</span>
+            </div>
+          </div>
+
+          <div id="verifyReadyList" class="verify-list"></div>
+        </div>
+      </div>
+
+      <div class="verify-actions">
+        <label class="verify-rank-label">
+          <input type="checkbox" id="verifyRankOption" value="rank" class="verify-row-check" />
+          <span>ถอดยศ STAR</span>
+        </label>
+
+        <div class="verify-btn-group">
+
+
+
+          <button id="verifyAddMockBtn" type="button" class="secondary verify-action-btn">
+            ➕ เพิ่มข้อมูล
+          </button>
+
+          <button id="verifyClearSelectedBtn" type="button" class="primary dark">
+            เคลียร์ข้อมูลที่เลือก
+          </button>
+        </div>
+
+
+        <div id="verifyResult" class="verify-result" hidden></div>
+    </section>
+  </section>
+
+    <section class="container tab-panel" id="tab-idcard">
+    <section class="card idcard-card">
+      <div class="card-title">
+        <div><span class="step">ID</span><b>Gen ID Card (ทดสอบ)</b></div>
+      </div>
+
+      <div class="idcard-layout">
+        <!-- ซ้าย: ฟอร์ม -->
+        <div class="idcard-form">
+          <label>เลขบัตรประชาชน (13 หลัก)
+            <div class="idcard-row">
+              <input id="idcNumber" maxlength="17" placeholder="1-2345-67890-12-3" />
+              <button id="idcRandomBtn" type="button" class="secondary">สุ่มเลข</button>
+            </div>
+            <small id="idcNumberHint"></small>
+          </label>
+
+          <label>ชื่อ (ไทย)       <input id="idcFirstTh" placeholder="สมชาย" /></label>
+          <label>นามสกุล (ไทย)    <input id="idcLastTh"  placeholder="ทดสอบ" /></label>
+          <label>First name (EN)  <input id="idcFirstEn" placeholder="Somchai" /></label>
+          <label>Last name (EN)   <input id="idcLastEn"  placeholder="Tester" /></label>
+
+          <label>รูปถ่าย: อัปโหลด
+            <input id="idcPhotoFile" type="file" accept="image/*" />
+          </label>
+          <label>หรือวาง URL รูป
+            <input id="idcPhotoUrl" placeholder="https://..." />
+                      <button id="idcResetPhotoBtn" type="button" class="secondary">ใช้รูปตั้งต้น</button>
+          </label>
+          <small id="idcPhotoHint"></small>
+
+          <div class="idcard-actions">
+            <button id="idcPngBtn" type="button" class="primary">⬇ ดาวน์โหลด PNG</button>
+            <button id="idcPdfBtn" type="button" class="primary dark">⬇ ดาวน์โหลด PDF</button>
+          </div>
+        </div>
+
+        <!-- ขวา: ตัวอย่าง -->
+        <div class="idcard-preview">
+          <canvas id="idcCanvas" width="1012" height="638"></canvas>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <dialog id="modeOptionsDialog" class="status-dialog">
+    <div class="status-dialog-content">
+      <h2>ตัวเลือกการสร้าง</h2>
+
+      <div class="mode-grid mode-dialog-grid">
+        <label class="mode">
+          <input type="radio" name="mode" value="manual">
+          <strong>Manual</strong>
+          <span>กำหนดข้อมูลเอง 1 กิจกรรม</span>
+        </label>
+
+        <label class="mode active">
+          <input type="radio" name="mode" value="bulk" checked>
+          <strong>Bulk</strong>
+          <span>สร้างหลายกิจกรรมจาก Template เดียว</span>
+        </label>
+
+        <label class="mode">
+          <input type="radio" name="mode" value="random">
+          <strong>Random Unique</strong>
+          <span>สุ่ม title / slug / จำนวน / วันเวลา ไม่ซ้ำ</span>
+        </label>
+
+        <label class="mode">
+          <input type="radio" name="mode" value="boundary">
+          <strong>Boundary / QA</strong>
+          <span>สร้างชุดข้อมูลสำหรับทดสอบค่าต่ำ/สูง/พิเศษ</span>
+        </label>
+      </div>
+
+      <div class="status-dialog-actions">
+        <button id="closeModeOptionsBtn" type="button" class="secondary">ปิด</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="campaignStatusDialog" class="status-dialog">
+    <div class="status-dialog-content">
+      <h2>เลือกสถานะกิจกรรม</h2>
+
+      <div class="status-options">
+        <label class="status-option">
+          <input type="radio" name="campaignStatusOption" value="" />
+          <span>กำหนดเวลาเอง</span>
+        </label>
+
+        <label class="status-option">
+          <input type="radio" name="campaignStatusOption" value="beforeRegister" />
+          <span>ยังไม่เปิดลงทะเบียน</span>
+        </label>
+
+        <label class="status-option">
+          <input type="radio" name="campaignStatusOption" value="registering" checked />
+          <span>เปิดลงทะเบียน</span>
+        </label>
+
+        <label class="status-option">
+          <input type="radio" name="campaignStatusOption" value="registrationClosed" />
+          <span>หมดเวลาลงทะเบียน</span>
+        </label>
+
+        <label class="status-option">
+          <input type="radio" name="campaignStatusOption" value="draft" />
+          <span>ถึงเวลาส่งดราฟต์</span>
+        </label>
+
+        <label class="status-option">
+          <input type="radio" name="campaignStatusOption" value="review" />
+          <span>ถึงเวลาส่งลิงก์รีวิว</span>
+        </label>
+
+        <label class="status-option">
+          <input type="radio" name="campaignStatusOption" value="ended" />
+          <span>สิ้นสุดกิจกรรม</span>
+        </label>
+      </div>
+
+      <div class="status-dialog-actions">
+        <button id="closeCampaignStatusBtn" type="button" class="secondary">
+          ปิด
+        </button>
+        <button id="applyCampaignStatusBtn" type="button" class="primary">
+          เลือกสถานะ
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="createPreviewDialog" class="preview-dialog">
+    <div class="preview-dialog-content">
+      <div class="preview-dialog-header">
+        <h2>ตรวจสอบกิจกรรมก่อนสร้าง</h2>
+        <button id="closeCreatePreviewBtn" type="button" class="secondary">ปิด</button>
+      </div>
+
+      <div class="preview-table-wrap">
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ชื่อกิจกรรม</th>
+              <th>Slug</th>
+              <th>Brand ID</th>
+              <th>Category ID</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="createPreviewTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="preview-dialog-actions">
+        <button id="cancelCreatePreviewBtn" type="button" class="secondary">
+          ย้อนกลับไปแก้ไข
+        </button>
+        <button id="confirmCreatePreviewBtn" type="button" class="primary dark">
+          ยืนยันสร้างกิจกรรม
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="/categories.js?v=4"></script>
+  <script src="/app.js?v=4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/idcard.js?v=1"></script>
+
+  <!-- Toast Container — วางก่อน </body> -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas" style="
+  position:fixed; inset:0; pointer-events:none;
+  z-index:9998; width:100%; height:100%;
+"></canvas>
+
+
+</body>
+
+</html>
